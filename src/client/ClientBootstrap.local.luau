@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local AuraManagerForClient = ReplicatedStorage:WaitForChild("Modules"):WaitForChild("AuraManagerForClient")
+local AuraManagerForClient = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("AuraManagerForClient")
 
 require(AuraManagerForClient)
 

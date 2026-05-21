@@ -3,17 +3,12 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Modules = ReplicatedStorage:WaitForChild("Modules")
+local Shared = ReplicatedStorage:WaitForChild("Shared")
 local AuraScripts = ReplicatedStorage:WaitForChild("Assets"):WaitForChild("AuraScripts")
-
-local Storage = ReplicatedStorage:WaitForChild("Storage")
-local Packets = ReplicatedStorage:WaitForChild("Packets")
-local AuraPacket = require(Packets:WaitForChild("Aura"))
-local RarityDB = require(Storage:WaitForChild("RarityDB"))
-local GoodSignal = require(Modules:WaitForChild("GoodSignal"))
+local AuraPacket = require(Shared:WaitForChild("Aura"))
 
 local auramanager = {}
-local PlayerAura = {}
+local _PlayerAura = {}
 auramanager.Auras = {}
 local Auras = auramanager.Auras
 

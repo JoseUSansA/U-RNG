@@ -8,8 +8,7 @@ local Assets = ServerStorage:WaitForChild("Assets")
 local Tiers = Assets:WaitForChild("Tiers")
 
 local Aura = require(script:WaitForChild("Aura"))
-local AuraPacket = require(Packets:WaitForChild("Aura"))
-local AuraDB = require(ReplicatedStorage.Storage.RarityDB)
+local AuraDB = require(ReplicatedStorage.Shared.RarityDB)
 local Animate = StarterPlayer:WaitForChild("StarterCharacterScripts"):WaitForChild("Animate")
 
 local module = {}
