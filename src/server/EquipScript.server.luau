@@ -1,4 +1,4 @@
-local AuraManager = require(game.ServerStorage.Shared.AuraManager)
+local AuraManager = require(game.ServerStorage.Storage.AuraManager)
 
 local AuraName = script:GetAttribute("AuraName")
 
