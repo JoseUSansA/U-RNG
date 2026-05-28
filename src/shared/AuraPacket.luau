@@ -1,9 +1,9 @@
 --// Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Shared = ReplicatedStorage:WaitForChild("Shared")
 
 --// Variables
-local Modules = ReplicatedStorage:WaitForChild("Modules")
-local ByteNet = require(Modules:WaitForChild("ByteNet"))
+local ByteNet = require(Shared:WaitForChild("ByteNet"))
 
 --// Definte Packets
 return ByteNet.defineNamespace("Aura", function()

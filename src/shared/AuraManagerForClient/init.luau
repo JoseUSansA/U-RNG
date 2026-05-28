@@ -5,7 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local AuraScripts = ReplicatedStorage:WaitForChild("Assets"):WaitForChild("AuraScripts")
-local AuraPacket = require(Shared:WaitForChild("Aura"))
+local AuraPacket = require(Shared:WaitForChild("AuraPacket"))
 
 local auramanager = {}
 local _PlayerAura = {}
