@@ -3,7 +3,6 @@ local ServerStorage = game:GetService("ServerStorage")
 local StarterPlayer = game:GetService("StarterPlayer")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Packets = ReplicatedStorage:WaitForChild("Packets")
 local Assets = ServerStorage:WaitForChild("Assets")
 local Tiers = Assets:WaitForChild("Tiers")
 
