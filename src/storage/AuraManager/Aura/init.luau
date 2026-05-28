@@ -6,7 +6,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- Uso de WaitForChild para evitar errores si las carpetas tardan en replicarse/cargar
 local Assets = ReplicatedStorage:WaitForChild("Assets")
 local AuraScripts = Assets:WaitForChild("AuraScripts")
-
+local AuraPacket = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("AuraPacket"))
 
 local module = {}
 module.auraScripts = {}
