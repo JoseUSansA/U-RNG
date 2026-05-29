@@ -25,7 +25,6 @@ module.AnimsOrigins = {}
 module.AuraConstraintInstances = {}
 
 local function SetCharacterHipHeight(Character: Model?, HipHeight: number)
-    -- Añadido timeout de 5 segundos para prevenir congelamiento del script
     local RootPart = Character and Character:WaitForChild("HumanoidRootPart", 5)
     if not RootPart then return end
     
@@ -98,7 +97,6 @@ function module.EquipAura(Character: Model?, AuraName: string)
             local original = ConstraintInfo.Instance
             local new = AuraInstancePath[original]
             
-            -- Validación: Solo proceder si el clon de la constraint existe
             if new then
                 for _, propertyName in ipairs(module.ConstraintPath[ConstraintInfo.ClassName]) do
                     if not original[propertyName] and original.ClassName ~= "Model" then
@@ -120,7 +118,6 @@ function module.EquipAura(Character: Model?, AuraName: string)
     local Humanoid = Character:FindFirstChildOfClass("Humanoid") 
     if Humanoid then
         local Name, skinName = table.unpack(AuraName:split("_"))
-        -- Corrección de seguridad para la DB: Busca por nombre completo o por base
         local auraData = AuraDB[AuraName] or AuraDB[Name]
         if auraData then
             local HipHeight = auraData.HipHeight or 0
@@ -147,7 +144,6 @@ function SetAnimation(Character: Model?, AuraInfo: Model)
     if not Character then return end
     local Animations = AuraInfo:FindFirstChild("Animations")
     
-    -- Añadido timeout de 5 segundos para evitar yields infinitos
     local AnimationScript = Character:WaitForChild("Animate", 5)
     if not AnimationScript then return end
     
@@ -160,7 +156,6 @@ function SetAnimation(Character: Model?, AuraInfo: Model)
             end
             characterAnimation.AnimationId = animation.AnimationId
         end
-        -- CORREGIDO: Ahora cambia el atributo del personaje, no el de StarterPlayer
         AnimationScript:SetAttribute("HasAnim", true)
     end
     AnimationScript:SetAttribute("Reboot", math.random())
@@ -224,7 +219,6 @@ function FindConstraints(parent: Instance)
     return ConstraintInstances
 end
 
--- Inicialización segura
 InitAuraConstraintInstances()
 
 for _, Animation in ipairs(Animate:GetDescendants()) do
