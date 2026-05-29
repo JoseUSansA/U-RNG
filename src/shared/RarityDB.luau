@@ -37,7 +37,11 @@ local Settings : {[string]: AuraInfo} = {
 	["Dreamer"] = {
 		CreatorId = 933728988;
 		Rarity = 25;
-	}
+	};
+	["Glitch"] = {
+		CreatorId = 933728988;
+		Rarity = 30;
+	};
 }
 
 return Settings :: {[string]: AuraInfo}
