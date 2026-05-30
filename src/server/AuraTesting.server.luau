@@ -8,18 +8,17 @@ print("==============================")
 print("INICIANDO PRUEBA DE BASE DE DATOS DE AURAS")
 print("==============================\n")
 
--- Función auxiliar para obtener el nombre (o nombres) desde el ID
-local function GetCreatorNames(creatorId)
-    if not creatorId then return "No definido" end
+-- Función auxiliar genérica para obtener nombres desde uno o varios IDs
+local function GetNamesFromIds(ids)
+    if not ids then return nil end -- Retorna nil si no hay ID configurado
     
     -- Si es una tabla con múltiples IDs
-    if type(creatorId) == "table" then
+    if type(ids) == "table" then
         local names = {}
-        for _, id in ipairs(creatorId) do
+        for _, id in ipairs(ids) do
             local success, name = pcall(function()
                 return Players:GetNameFromUserIdAsync(id)
             end)
-            -- Si falla, muestra el ID numérico; si funciona, muestra el nombre
             table.insert(names, success and name or tostring(id))
         end
         return table.concat(names, ", ")
@@ -27,23 +26,31 @@ local function GetCreatorNames(creatorId)
     
     -- Si es un solo ID numérico
     local success, name = pcall(function()
-        return Players:GetNameFromUserIdAsync(creatorId)
+        return Players:GetNameFromUserIdAsync(ids)
     end)
     
-    return success and name or tostring(creatorId)
+    return success and name or tostring(ids)
 end
 
 for auraName, info in pairs(AuraDB) do
     print(`[ Aura: {auraName} ]`)
     print(` > Rareza: 1 en {info.Rarity}`)
     
-    -- Convertimos el ID a nombre aquí
-    local creatorName = GetCreatorNames(info.CreatorId)
+    -- Procesar Creador
+    local creatorName = GetNamesFromIds(info.CreatorId)
+    local creatorIdString = type(info.CreatorId) == "table" and "Múltiples IDs" or (info.CreatorId or "N/A")
+    print(` > Creador: {creatorName or "No definido"} (ID: {creatorIdString})`)
     
-    -- Manejo visual por si la tabla de múltiples IDs se imprime raro al concatenar
-    local idString = type(info.CreatorId) == "table" and "Múltiples IDs" or (info.CreatorId or "N/A")
-    print(` > Creador: {creatorName} (ID: {idString})`)
+    -- Procesar Creador del Concepto
+    local conceptName = GetNamesFromIds(info.ConceptId)
+    if conceptName then
+        local conceptIdString = type(info.ConceptId) == "table" and "Múltiples IDs" or info.ConceptId
+        print(` > Concepto por: {conceptName} (ID: {conceptIdString})`)
+    else
+        print(` > Concepto por: No definido`)
+    end
     
+    -- Procesar Audio
     if info.AudioInfo then
         print(` > Música: '{info.AudioInfo.Name}' por {info.AudioInfo.Author}`)
     else

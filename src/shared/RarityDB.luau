@@ -34,6 +34,7 @@ local Settings : {[string]: AuraInfo} = {
 	["Patience"] = {
 		CreatorId = 933728988;
 		Rarity = 20;
+		ConceptId = 3617604552;
 	};
 	["Dreamer"] = {
 		CreatorId = 933728988;
