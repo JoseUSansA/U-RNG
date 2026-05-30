@@ -53,7 +53,12 @@ local Settings : {[string]: AuraInfo} = {
 		CreatorId = 933728988;
 		Rarity = 50;
 		AudioInfo = {Name = "波 (Wave)", Author = "Distrokid"}
-	}
+	};
+	["Fire"] = {
+		CreatorId = 933728988;
+		Rarity = 100;
+		ConceptId = 2653920408;
+	};
 }
 
 return Settings :: {[string]: AuraInfo}
