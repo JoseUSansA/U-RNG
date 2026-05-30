@@ -48,6 +48,11 @@ local Settings : {[string]: AuraInfo} = {
 	["Future"] = {
 		CreatorId = 933728988;
 		Rarity = 40;
+	};
+	["Wavestep"] = {
+		CreatorId = 933728988;
+		Rarity = 50;
+		AudioInfo = {Name = "波 (Wave)", Author = "Distrokid"}
 	}
 }
 
