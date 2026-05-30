@@ -52,7 +52,9 @@ function Equip(data)
 		module.start(Character)
 	end
 
-	module.RenderEvent = RunService.RenderStepped:Connect(module.loop)
+	module.RenderEvent = RunService.RenderStepped:Connect(function(deltaTime)
+		module.loop(Character, deltaTime)
+	end)
 
 	Auras[Character] = module
 
