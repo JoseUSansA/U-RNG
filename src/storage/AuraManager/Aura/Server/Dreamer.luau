@@ -27,7 +27,7 @@ function module.setup(character)
     end)
 end
 
-function module.loop(deltaTime: number)
+function module.loop(Character: Model, deltaTime: number)
     local tiempo = os.clock() * VELOCIDAD_GRADIENTE
     
     for _, characterData in DatosAura do

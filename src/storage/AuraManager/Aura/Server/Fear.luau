@@ -28,7 +28,7 @@ function module.setup(character)
 	end)
 end
 
-function module.loop(deltaTime: number)
+function module.loop(Character: Model, deltaTime: number)
 	for _, characterData in DatosAura do
 		for _, texto in characterData.Textos do
 			if texto and characterData.Posiciones[texto] then
