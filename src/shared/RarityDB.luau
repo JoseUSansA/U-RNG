@@ -1,4 +1,5 @@
 export type AuraInfo = {
+	Rarity: number;
 	HipHeight: number?;
 	AudioInfo: {Name: string, Author: string}?;
 	CreatorId: (number | {number})?;
@@ -37,7 +38,7 @@ local Settings : {[string]: AuraInfo} = {
 	["Dreamer"] = {
 		CreatorId = 933728988;
 		Rarity = 25;
-		AudioInfo = {"Level 3", "Distrokid"};
+		AudioInfo = {Name = "Level 3", Author = "Distrokid"};
 	};
 	["Glitch"] = {
 		CreatorId = 933728988;
