@@ -59,6 +59,10 @@ local Settings : {[string]: AuraInfo} = {
 		Rarity = 100;
 		ConceptId = 2653920408;
 	};
+	["Interdimensional"] = {
+		CreatorId = 933728988;
+		Rarity = 200;
+	};
 }
 
 return Settings :: {[string]: AuraInfo}
