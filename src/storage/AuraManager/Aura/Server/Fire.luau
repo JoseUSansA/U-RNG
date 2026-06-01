@@ -1,7 +1,7 @@
 local module = {}
 
 local DatosAura = {}
-local GRADOS_POR_SEGUNDO = 45
+local GRADOS_POR_SEGUNDO = 90
 
 function module.setup(character)
 	print("[SETUP] Iniciado para", character.Name)
