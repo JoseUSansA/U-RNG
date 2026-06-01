@@ -51,7 +51,7 @@ function module.setup(character: Model, AuraName: string, AuraInstances: table)
         module.loop(character, deltaTime)
         
         if auraServerModule.loop then
-            auraServerModule.loop(deltaTime)
+            auraServerModule.loop(character, deltaTime)
         end
     end)
 end
