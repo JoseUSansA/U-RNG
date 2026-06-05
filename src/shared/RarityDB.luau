@@ -63,6 +63,10 @@ local Settings : {[string]: AuraInfo} = {
 		CreatorId = 933728988;
 		Rarity = 200;
 	};
+	["Common_Chromosome"] = {
+		CreatorId = 933728988;
+		Rarity = 250;
+	};
 }
 
 return Settings :: {[string]: AuraInfo}

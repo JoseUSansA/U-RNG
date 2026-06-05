@@ -16,13 +16,13 @@ function module.setup(character)
 			return
 		end
 
-		local fog = hrp:WaitForChild("Fog", 5)
+		local floor = hrp:WaitForChild("Floor", 5)
 
-		if not fog then
+		if not floor then
 			return
 		end
 
-		local heartAtt = fog:WaitForChild("Heart", 5)
+		local heartAtt = floor:WaitForChild("Heart", 5)
 
 		if not heartAtt then
 			return
@@ -43,10 +43,9 @@ function module.loop(character: Model, deltaTime: number)
 	local rotacionFrame = math.rad(GRADOS_POR_SEGUNDO * deltaTime)
 
 	for attachment, _ in pairs(data.Attachments) do
-
 		if attachment and attachment.Parent then
 			attachment.CFrame *= CFrame.Angles(0, rotacionFrame, 0)
-		end
+        end
 	end
 end
 
@@ -66,6 +65,7 @@ function module.cleanup(character)
 	end
 
 	DatosAura[character] = nil
+
 end
 
 return module
