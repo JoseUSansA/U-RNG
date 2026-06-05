@@ -1,7 +1,7 @@
 local module = {}
 
 local DatosAura = {}
-local GRADOS_POR_SEGUNDO = 90
+local GRADOS_POR_SEGUNDO = 115
 
 function module.setup(character)
 
