@@ -39,7 +39,7 @@ local Settings : {[string]: AuraInfo} = {
 	["Dreamer"] = {
 		CreatorId = 933728988;
 		Rarity = 25;
-		AudioInfo = {Name = "Level 3", Author = "Distrokid"};
+		AudioInfo = {Name = "Level 3", Author = "Flared Anomaly (BACKROOMS: Arrival)"};
 	};
 	["Glitch"] = {
 		CreatorId = 933728988;
@@ -52,7 +52,7 @@ local Settings : {[string]: AuraInfo} = {
 	["Wavestep"] = {
 		CreatorId = 933728988;
 		Rarity = 50;
-		AudioInfo = {Name = "波 (Wave)", Author = "Distrokid"}
+		AudioInfo = {Name = "波 (Wave)", Author = "Joejoe Chow (VAPORWAVE TRIP)"}
 	};
 	["Fire"] = {
 		CreatorId = 933728988;
