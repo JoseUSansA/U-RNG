@@ -67,6 +67,7 @@ local Settings : {[string]: AuraInfo} = {
 		CreatorId = 933728988;
 		Rarity = 250;
 	};
+	-- Unfinished/Undone
 	["Cherry"] = {
 		CreatorId = 933728988;
 		Rarity = 300;
