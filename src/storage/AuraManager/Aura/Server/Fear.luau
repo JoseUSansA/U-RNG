@@ -29,27 +29,26 @@ function module.setup(character)
 end
 
 function module.loop(Character: Model, deltaTime: number)
-	for _, characterData in DatosAura do
-		for _, texto in characterData.Textos do
-			if texto and characterData.Posiciones[texto] then
-				local PosOriginal = characterData.Posiciones[texto]
+    local characterData = DatosAura[Character]
+    if not characterData then return end
+    for _, texto in characterData.Textos do
+        if texto and characterData.Posiciones[texto] then
+            local PosOriginal = characterData.Posiciones[texto]
 
-				local TemblorX = math.random(-2, 2)
-				local TemblorY = math.random(-2, 2)
+            local TemblorX = math.random(-2, 2)
+            local TemblorY = math.random(-2, 2)
 
-				texto.Position = UDim2.new(
-					PosOriginal.X.Scale, PosOriginal.X.Offset + TemblorX,
-					PosOriginal.Y.Scale, PosOriginal.Y.Offset + TemblorY
-				)
+            texto.Position = UDim2.new(
+                PosOriginal.X.Scale, PosOriginal.X.Offset + TemblorX,
+                PosOriginal.Y.Scale, PosOriginal.Y.Offset + TemblorY
+            )
 
-				texto.Rotation = math.random(-2, 2)
-			end
-		end
-	end
+            texto.Rotation = math.random(-2, 2)
+        end
+    end
 end
 
 function module.cleanup(character)
-	print("6. [Fear Client] Limpiando aura de:", character.Name)
 	if DatosAura[character] then
 		for texto, PosOriginal in DatosAura[character].Posiciones do
 			if texto then
