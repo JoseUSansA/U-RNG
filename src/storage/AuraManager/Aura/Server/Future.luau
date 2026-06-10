@@ -18,7 +18,6 @@ function module.setup(character)
         local CartelUI = att:WaitForChild("BillboardGui", 5)
         if not CartelUI then return end
 
-        -- Buscamos los UIGradient dentro del BillboardGui
         for _, elemento in CartelUI:GetDescendants() do
             if elemento:IsA("UIGradient") then
                 table.insert(DatosAura[character].Gradients, elemento)
@@ -28,19 +27,17 @@ function module.setup(character)
 end
 
 function module.loop(Character: Model, deltaTime: number)
+    local characterData = DatosAura[Character]
+    if not characterData then return end
     local tiempo = os.clock() * VELOCIDAD_GRADIENTE
-    
-    for _, characterData in DatosAura do
-        for _, gradient in characterData.Gradients do
-            if gradient then
-                gradient.Offset = Vector2.new(math.sin(tiempo), 0)
-            end
+    for _, gradient in characterData.Gradients do
+        if gradient then
+            gradient.Offset = Vector2.new(math.sin(tiempo), 0)
         end
     end
 end
 
 function module.cleanup(character)
-    print("Limpiando gradiente de:", character.Name)
     if DatosAura[character] then
         for _, gradient in DatosAura[character].Gradients do
             if gradient then
