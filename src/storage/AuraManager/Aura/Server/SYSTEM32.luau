@@ -12,7 +12,7 @@ local RAINBOW_COLORS = {
 	Color3.fromRGB(148, 0, 211)
 }
 
-local COLOR_CHANGE_SPEED = 15
+local COLOR_CHANGE_SPEED = 5
 local SWAY_SPEED = 6
 local MAX_SWAY_DEG = 25
 
