@@ -124,6 +124,9 @@ local Settings : {[string]: AuraInfo} = {
         CreatorId = 933728988;
         Rarity = 10000;
     };
+	["WIP"] = {
+		Rarity = 1;
+	}
 }
 
 return Settings :: {[string]: AuraInfo}
