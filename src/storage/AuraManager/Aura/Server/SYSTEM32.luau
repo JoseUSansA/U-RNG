@@ -102,7 +102,7 @@ function module.loop(character: Model, deltaTime: number)
 	local currentTime = data.Audio.TimePosition
 	data.TimeActive += deltaTime
 
-	if currentTime >= 11 and currentTime < 74 and data.Phase == 0 then
+	if currentTime >= 13 and currentTime < 74 and data.Phase == 0 then
 		data.Phase = 1
 		applyGlitchState(character, data)
 	elseif currentTime >= 74 and data.Phase == 1 then
