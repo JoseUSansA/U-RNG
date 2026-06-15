@@ -4,26 +4,45 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local LocalPlayer = Players.LocalPlayer
-local RarityDB = require(ReplicatedStorage.Shared.RarityDB)
-local RollEvent = ReplicatedStorage:WaitForChild("RollAuraEvent")
 
--- Referencias a la carpeta de títulos que el servidor nos preparó
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local StorageGui = PlayerGui:WaitForChild("AuraTitleStorage")
-local TitlesFolder = StorageGui:WaitForChild("Titles")
+local RarityDB
+local dbSuccess, dbErr = pcall(function()
+    RarityDB = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("RarityDB"))
+end)
+if not dbSuccess or not RarityDB then
+    warn("RollScript CRÍTICO: No se pudo cargar RarityDB de ReplicatedStorage.Shared.RarityDB -> " .. tostring(dbErr))
+    return
+end
 
--- Crear un ScreenGui principal para mostrar la animación en el centro
+local RollEvent = ReplicatedStorage:WaitForChild("RollAuraEvent", 10)
+if not RollEvent then
+    warn("RollScript ERROR: No se encontro el RemoteEvent 'RollAuraEvent' en ReplicatedStorage tras 10 segundos")
+    return
+end
+
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui", 10)
+local StorageGui = PlayerGui and PlayerGui:WaitForChild("AuraTitleStorage", 10)
+local TitlesFolder = StorageGui and StorageGui:WaitForChild("Titles", 10)
+
+if not TitlesFolder then
+    warn("RollScript ERROR: No se encontro la carpeta 'AuraTitleStorage.Titles' dentro del PlayerGui. El EquipScript del servidor podria haber fallado al crearla.")
+    return
+end
+
 local mainRollGui = Instance.new("ScreenGui")
 mainRollGui.Name = "AuraRollAnimation"
 mainRollGui.ResetOnSpawn = false
 mainRollGui.Parent = PlayerGui
 
--- --- 1. ORDENAR AURAS DE MAYOR A MENOR RAREZA (Para el cálculo real) ---
 local sortedAuras = {}
-local allAuraNames = {} -- Para elegir "fallos" al azar
+local allAuraNames = {}
 for auraName, auraInfo in pairs(RarityDB) do
     table.insert(sortedAuras, {Name = auraName, Rarity = auraInfo.Rarity})
     table.insert(allAuraNames, auraName)
+end
+
+if #sortedAuras == 0 then
+    warn("RollScript ADVERTENCIA: El modulo RarityDB no devolvio ninguna aura configurada.")
 end
 
 table.sort(sortedAuras, function(a, b)
@@ -32,75 +51,67 @@ end)
 
 local isRolling = false
 
-
--- --- FUNCIÓN DE UTILIDAD: CENTRAR UN TEXTLABEL ---
 local function centerLabel(label)
     label.AnchorPoint = Vector2.new(0.5, 0.5)
-    label.Position = UDim2.new(0.5, 0, 0.5, 0) -- Centro absoluto
+    label.Position = UDim2.new(0.5, 0, 0.5, 0)
     label.Parent = mainRollGui
     label.Visible = true
 end
 
-
--- --- FUNCIÓN DEL RNG REAL ---
 local function calculateRealRoll()
     for _, aura in ipairs(sortedAuras) do
         local chance = math.random(1, aura.Rarity)
         if chance == 1 then
-            return aura.Name 
+            return aura.Name
         end
     end
-    return "Common" 
+    return "Common"
 end
 
-
--- --- DETECTAR TECLA 'R' ---
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed or isRolling then return end
 
     if input.KeyCode == Enum.KeyCode.R then
         isRolling = true
-        
-        -- --- 2. ANIMACIÓN DE GIRO (5 FALLOS TOTALMENTE AL AZAR) ---
+
+        if #allAuraNames == 0 then
+            warn("RollScript ERROR: No se pueden mostrar fallos visuales porque la lista de nombres esta vacia.")
+        end
+
         for i = 1, 5 do
-            -- Elegimos un aura totalmente al azar para el efecto visual
-            local randomVisualName = allAuraNames[math.random(1, #allAuraNames)]
-            local storedLabel = TitlesFolder:FindFirstChild(randomVisualName)
-            
-            if storedLabel then
-                -- Clonamos el título visual para mostrarlo en el ScreenGui principal
-                local visualClone = storedLabel:Clone()
-                visualClone.TextTransparency = 0 -- Asegurar que sea visible
-                centerLabel(visualClone)
-                
-                task.wait(0.1) -- Duración del destello
-                
-                visualClone:Destroy() -- Lo destruimos inmediatamente
+            if #allAuraNames > 0 then
+                local randomVisualName = allAuraNames[math.random(1, #allAuraNames)]
+                local storedLabel = TitlesFolder:FindFirstChild(randomVisualName)
+
+                if storedLabel then
+                    local visualClone = storedLabel:Clone()
+                    visualClone.TextTransparency = 0
+                    centerLabel(visualClone)
+                    task.wait(0.1)
+                    visualClone:Destroy()
+                else
+                    warn("RollScript ADVERTENCIA: Se intento animar visualmente '" .. tostring(randomVisualName) .. "' pero su TextLabel clonado no existe en TitlesFolder.")
+                    task.wait(0.1)
+                end
             else
-                task.wait(0.1) -- Mantener el ritmo si falta el título
+                task.wait(0.1)
             end
         end
-        
-        -- --- 3. CALCULAR RESULTADO REAL Y MOSTRARLO ---
+
         local finalAuraName = calculateRealRoll()
-        -- print("¡Te ha tocado (Cálculo Real): " .. finalAuraName .. "!")
-        
         local finalStoredLabel = TitlesFolder:FindFirstChild(finalAuraName)
+
         if finalStoredLabel then
-            -- Clonamos y centramos el título del aura ganadora
             local finalVisualLabel = finalStoredLabel:Clone()
             finalVisualLabel.TextTransparency = 0
             centerLabel(finalVisualLabel)
-            
-            -- Opcional: Podrías añadir un efecto de sonido aquí
-            
-            task.wait(2) -- Queda en pantalla 2 segundos
+            task.wait(2)
             finalVisualLabel:Destroy()
+        else
+            warn("RollScript ERROR: El RNG calculo que ganaste '" .. tostring(finalAuraName) .. "', pero no se pudo mostrar el titulo final porque no existe en TitlesFolder.")
         end
-        
-        -- --- 4. ENVIAR RESULTADO AL SERVIDOR PARA EQUIPAR ---
+
         RollEvent:FireServer(finalAuraName)
-        
         isRolling = false
     end
 end)

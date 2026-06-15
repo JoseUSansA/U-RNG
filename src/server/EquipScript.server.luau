@@ -1,23 +1,31 @@
 -- EquipScript.server.luau
 local ServerStorage = game:GetService("ServerStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local AuraManager = require(ServerStorage.Storage.AuraManager)
 
--- Ruta a tus auras en ServerStorage
-local TIERS_PATH = ServerStorage:FindFirstChild("Assets") and ServerStorage.Assets:FindFirstChild("Tiers")
+local AuraManager
+local success, err = pcall(function()
+    AuraManager = require(ServerStorage:WaitForChild("Storage"):WaitForChild("AuraManager"))
+end)
+if not success or not AuraManager then
+    warn("EquipScript CRÍTICO: No se pudo cargar el modulo AuraManager. Verifica la ruta ServerStorage.Storage.AuraManager -> " .. tostring(err))
+end
 
-if not TIERS_PATH then
-    warn("CRÍTICO: No se encontró la ruta ServerStorage.Assets.Tiers")
+local assetsFolder = ServerStorage:FindFirstChild("Assets")
+local tiersPath = assetsFolder and assetsFolder:FindFirstChild("Tiers")
+if not tiersPath then
+    warn("EquipScript ERROR: No se encontro la carpeta fisica de las auras en ServerStorage.Assets.Tiers")
 end
 
 game.Players.PlayerAdded:Connect(function(player: Player)
-    local playerGui = player:WaitForChild("PlayerGui")
+    local playerGui = player:WaitForChild("PlayerGui", 10)
+    if not playerGui then
+        warn("EquipScript ERROR: Tiempo de espera agotado (10s) para encontrar el PlayerGui de " .. player.Name)
+        return
+    end
 
-    -- --- PARTE 1: REPLICACIÓN DE TÍTULOS PARA LA ANIMACIÓN (PROVISORIO) ---
-    -- Creamos un ScreenGui oculto para guardar los clones de los TextLabels
     local storageGui = Instance.new("ScreenGui")
     storageGui.Name = "AuraTitleStorage"
-    storageGui.Enabled = false -- Mantener oculto
+    storageGui.Enabled = false
     storageGui.ResetOnSpawn = false
     storageGui.Parent = playerGui
 
@@ -25,53 +33,60 @@ game.Players.PlayerAdded:Connect(function(player: Player)
     titlesFolder.Name = "Titles"
     titlesFolder.Parent = storageGui
 
-    -- Buscamos y clonamos los TextLabels de cada aura
-    if TIERS_PATH then
-        for _, auraFolder in ipairs(TIERS_PATH:GetChildren()) do
-            -- Tu jerarquía: nombredelaura > Head > BillboardGui > Name (TextLabel)
+    if tiersPath then
+        local foundAny = false
+        for _, auraFolder in ipairs(tiersPath:GetChildren()) do
             local head = auraFolder:FindFirstChild("Head")
             local billboard = head and head:FindFirstChild("BillboardGui")
             local nameLabel = billboard and billboard:FindFirstChild("Name")
 
             if nameLabel and nameLabel:IsA("TextLabel") then
                 local labelClone = nameLabel:Clone()
-                labelClone.Name = auraFolder.Name -- Renombramos el clon con el nombre de la aura
+                labelClone.Name = auraFolder.Name
                 labelClone.Parent = titlesFolder
+                foundAny = true
+            else
+                warn("EquipScript ADVERTENCIA: Al aura '" .. auraFolder.Name .. "' le falta la jerarquia exacta -> Head > BillboardGui > Name (TextLabel)")
             end
+        end
+        if not foundAny then
+            warn("EquipScript ERROR: No se pudo clonar ningun TextLabel de ServerStorage.Assets.Tiers. La carpeta podria estar vacia.")
         end
     end
 
-
-    -- --- PARTE 2: GESTIÓN DE ATRIBUTOS Y EQUIPADO SEGURO ---
-    -- Asignar aura por defecto si no tiene
     if not player:GetAttribute("AuraName") then
         player:SetAttribute("AuraName", "Common")
     end
 
-    -- Equipar cuando reaparece el personaje (muerte/reinicio)
     player.CharacterAdded:Connect(function(character: Model)
-        task.wait(0.5) -- Pequeño margen de seguridad para la carga física
+        task.wait(0.5)
         local currentAura = player:GetAttribute("AuraName")
-        if currentAura then
-            AuraManager.EquipAura(character, currentAura)
+        if currentAura and AuraManager then
+            local ok, equipErr = pcall(function()
+                AuraManager.EquipAura(character, currentAura)
+            end)
+            if not ok then
+                warn("EquipScript ERROR: AuraManager fallo internamente al equipar el aura inicial '" .. tostring(currentAura) .. "' -> " .. tostring(equipErr))
+            end
         end
     end)
 
-    -- SEGURO ANTI-CRASHEO (Denounce table)
-    local isEquipping = {} 
-
+    local isEquipping = false
     player:GetAttributeChangedSignal("AuraName"):Connect(function()
-        -- Si el jugador ya se está equipando, ignoramos esta señal para evitar bucles infinitos
-        if isEquipping[player] then return end 
-        isEquipping[player] = true
-        
+        if isEquipping then return end
+        isEquipping = true
+
         local newAura = player:GetAttribute("AuraName")
-        if player.Character and newAura then
-            -- print("Equipando nueva aura a " .. player.Name .. ": " .. newAura)
-            AuraManager.EquipAura(player.Character, newAura)
+        if player.Character and newAura and AuraManager then
+            local ok, equipErr = pcall(function()
+                AuraManager.EquipAura(player.Character, newAura)
+            end)
+            if not ok then
+                warn("EquipScript ERROR: AuraManager fallo internamente al equipar la nueva aura '" .. tostring(newAura) .. "' -> " .. tostring(equipErr))
+            end
         end
-        
-        task.wait(0.1) -- Tiempo de enfriamiento
-        isEquipping[player] = nil -- Permitir volver a equipar
+
+        task.wait(0.1)
+        isEquipping = false
     end)
 end)
