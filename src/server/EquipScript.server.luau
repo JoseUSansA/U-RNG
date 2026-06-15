@@ -36,8 +36,10 @@ game.Players.PlayerAdded:Connect(function(player: Player)
     if tiersPath then
         local foundAny = false
         for _, auraFolder in ipairs(tiersPath:GetChildren()) do
+            -- NUEVA JERARQUÍA APLICADA AQUÍ: Head > title (Attachment) > BillboardGui > Name
             local head = auraFolder:FindFirstChild("Head")
-            local billboard = head and head:FindFirstChild("BillboardGui")
+            local titleAttachment = head and head:FindFirstChild("title")
+            local billboard = titleAttachment and titleAttachment:FindFirstChild("BillboardGui")
             local nameLabel = billboard and billboard:FindFirstChild("Name")
 
             if nameLabel and nameLabel:IsA("TextLabel") then
@@ -46,11 +48,11 @@ game.Players.PlayerAdded:Connect(function(player: Player)
                 labelClone.Parent = titlesFolder
                 foundAny = true
             else
-                warn("EquipScript ADVERTENCIA: Al aura '" .. auraFolder.Name .. "' le falta la jerarquia exacta -> Head > BillboardGui > Name (TextLabel)")
+                warn("EquipScript ADVERTENCIA: Al aura '" .. auraFolder.Name .. "' le falta la jerarquia exacta -> Head > title > BillboardGui > Name (TextLabel)")
             end
         end
         if not foundAny then
-            warn("EquipScript ERROR: No se pudo clonar ningun TextLabel de ServerStorage.Assets.Tiers. La carpeta podria estar vacia.")
+            warn("EquipScript ERROR: No se pudo clonar ningun TextLabel de ServerStorage.Assets.Tiers. Revisa las advertencias anteriores.")
         end
     end
 
