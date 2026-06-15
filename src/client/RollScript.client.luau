@@ -7,13 +7,23 @@ local LocalPlayer = Players.LocalPlayer
 local RarityDB = require(ReplicatedStorage.Shared.RarityDB)
 local RollEvent = ReplicatedStorage:WaitForChild("RollAuraEvent")
 
--- Buscar la carpeta que el servidor preparó para nosotros en ReplicatedStorage
-local ClientHeadsFolder = ReplicatedStorage:WaitForChild("ClientRollHeads")
+-- Referencias a la carpeta de títulos que el servidor nos preparó
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local StorageGui = PlayerGui:WaitForChild("AuraTitleStorage")
+local TitlesFolder = StorageGui:WaitForChild("Titles")
 
--- Ordenar las auras de mayor a menor rareza
+-- Crear un ScreenGui principal para mostrar la animación en el centro
+local mainRollGui = Instance.new("ScreenGui")
+mainRollGui.Name = "AuraRollAnimation"
+mainRollGui.ResetOnSpawn = false
+mainRollGui.Parent = PlayerGui
+
+-- --- 1. ORDENAR AURAS DE MAYOR A MENOR RAREZA (Para el cálculo real) ---
 local sortedAuras = {}
+local allAuraNames = {} -- Para elegir "fallos" al azar
 for auraName, auraInfo in pairs(RarityDB) do
     table.insert(sortedAuras, {Name = auraName, Rarity = auraInfo.Rarity})
+    table.insert(allAuraNames, auraName)
 end
 
 table.sort(sortedAuras, function(a, b)
@@ -22,8 +32,18 @@ end)
 
 local isRolling = false
 
--- Función del RNG
-local function calculateRoll()
+
+-- --- FUNCIÓN DE UTILIDAD: CENTRAR UN TEXTLABEL ---
+local function centerLabel(label)
+    label.AnchorPoint = Vector2.new(0.5, 0.5)
+    label.Position = UDim2.new(0.5, 0, 0.5, 0) -- Centro absoluto
+    label.Parent = mainRollGui
+    label.Visible = true
+end
+
+
+-- --- FUNCIÓN DEL RNG REAL ---
+local function calculateRealRoll()
     for _, aura in ipairs(sortedAuras) do
         local chance = math.random(1, aura.Rarity)
         if chance == 1 then
@@ -33,51 +53,53 @@ local function calculateRoll()
     return "Common" 
 end
 
--- Detectar tecla 'R'
+
+-- --- DETECTAR TECLA 'R' ---
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed or isRolling then return end
 
     if input.KeyCode == Enum.KeyCode.R then
         isRolling = true
         
-        -- Animación de los 5 primeros destellos
+        -- --- 2. ANIMACIÓN DE GIRO (5 FALLOS TOTALMENTE AL AZAR) ---
         for i = 1, 5 do
-            local randomVisualAura = sortedAuras[math.random(1, #sortedAuras)].Name
-            local headClone = ClientHeadsFolder:FindFirstChild(randomVisualAura)
+            -- Elegimos un aura totalmente al azar para el efecto visual
+            local randomVisualName = allAuraNames[math.random(1, #allAuraNames)]
+            local storedLabel = TitlesFolder:FindFirstChild(randomVisualName)
             
-            if headClone then
-                -- TU JERARQUÍA: Head > BillboardGui > Name (TextLabel)
-                local nameLabel = headClone:FindFirstChild("BillboardGui") and headClone.BillboardGui:FindFirstChild("Name")
+            if storedLabel then
+                -- Clonamos el título visual para mostrarlo en el ScreenGui principal
+                local visualClone = storedLabel:Clone()
+                visualClone.TextTransparency = 0 -- Asegurar que sea visible
+                centerLabel(visualClone)
                 
-                if nameLabel and nameLabel:IsA("TextLabel") then
-                    nameLabel.Visible = true
-                    task.wait(0.1)
-                    nameLabel.Visible = false
-                else
-                    task.wait(0.1)
-                end
+                task.wait(0.1) -- Duración del destello
+                
+                visualClone:Destroy() -- Lo destruimos inmediatamente
             else
-                task.wait(0.1)
+                task.wait(0.1) -- Mantener el ritmo si falta el título
             end
         end
         
-        -- Calcular el 6to resultado (el real) y mostrarlo
-        local finalAura = calculateRoll()
+        -- --- 3. CALCULAR RESULTADO REAL Y MOSTRARLO ---
+        local finalAuraName = calculateRealRoll()
+        -- print("¡Te ha tocado (Cálculo Real): " .. finalAuraName .. "!")
         
-        local finalHead = ClientHeadsFolder:FindFirstChild(finalAura)
-        if finalHead then
-            -- TU JERARQUÍA FINAL
-            local finalNameLabel = finalHead:FindFirstChild("BillboardGui") and finalHead.BillboardGui:FindFirstChild("Name")
+        local finalStoredLabel = TitlesFolder:FindFirstChild(finalAuraName)
+        if finalStoredLabel then
+            -- Clonamos y centramos el título del aura ganadora
+            local finalVisualLabel = finalStoredLabel:Clone()
+            finalVisualLabel.TextTransparency = 0
+            centerLabel(finalVisualLabel)
             
-            if finalNameLabel and finalNameLabel:IsA("TextLabel") then
-                finalNameLabel.Visible = true
-                task.wait(2) -- Queda en pantalla 2 segundos
-                finalNameLabel.Visible = false
-            end
+            -- Opcional: Podrías añadir un efecto de sonido aquí
+            
+            task.wait(2) -- Queda en pantalla 2 segundos
+            finalVisualLabel:Destroy()
         end
         
-        -- Enviar al servidor el resultado real
-        RollEvent:FireServer(finalAura)
+        -- --- 4. ENVIAR RESULTADO AL SERVIDOR PARA EQUIPAR ---
+        RollEvent:FireServer(finalAuraName)
         
         isRolling = false
     end
