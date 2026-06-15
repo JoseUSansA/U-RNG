@@ -45,28 +45,40 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         -- Animación de los 5 primeros destellos
         for i = 1, 5 do
             local randomVisualAura = sortedAuras[math.random(1, #sortedAuras)].Name
-            local textLabel = TiersFolder:FindFirstChild(randomVisualAura)
+            local auraFolder = TiersFolder:FindFirstChild(randomVisualAura)
             
-            if textLabel then
-                textLabel.Visible = true
-                task.wait(0.1) -- Un par de microsegundos no se detectan bien en pantalla, 0.1 es óptimo
-                textLabel.Visible = false
+            if auraFolder then
+                -- BUSCAMOS EL TEXTLABEL DENTRO DE LA CARPETA
+                local textLabel = auraFolder:FindFirstChildWhichIsA("TextLabel")
+                
+                if textLabel then
+                    textLabel.Visible = true
+                    task.wait(0.1)
+                    textLabel.Visible = false
+                else
+                    task.wait(0.1) -- Mantiene el ritmo si la carpeta está vacía
+                end
             else
-                task.wait(0.1) -- Mantener el ritmo aunque falte un TextLabel
+                task.wait(0.1) -- Mantiene el ritmo si la carpeta no existe
             end
         end
         
-        -- Calcular el 6to resultado y mostrarlo
+        -- Calcular el 6to resultado (el real) y mostrarlo
         local finalAura = calculateRoll()
         
-        local finalTextLabel = TiersFolder:FindFirstChild(finalAura)
-        if finalTextLabel then
-            finalTextLabel.Visible = true
-            task.wait(2) -- Queda en pantalla 2 segundos
-            finalTextLabel.Visible = false
+        local finalFolder = TiersFolder:FindFirstChild(finalAura)
+        if finalFolder then
+            -- BUSCAMOS EL TEXTLABEL DENTRO DE LA CARPETA FINAL
+            local finalTextLabel = finalFolder:FindFirstChildWhichIsA("TextLabel")
+            
+            if finalTextLabel then
+                finalTextLabel.Visible = true
+                task.wait(2) -- Queda en pantalla 2 segundos
+                finalTextLabel.Visible = false
+            end
         end
         
-        -- Enviar al servidor
+        -- Enviar al servidor el resultado real
         RollEvent:FireServer(finalAura)
         
         isRolling = false
