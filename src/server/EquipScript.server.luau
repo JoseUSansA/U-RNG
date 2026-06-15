@@ -1,51 +1,61 @@
 -- EquipScript.server.luau
 local ServerStorage = game:GetService("ServerStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AuraManager = require(ServerStorage.Storage.AuraManager)
 
+-- NUEVO: Crear carpeta segura para que el cliente acceda a los títulos
+local assetsFolder = ServerStorage:FindFirstChild("Assets")
+if assetsFolder and assetsFolder:FindFirstChild("Tiers") then
+    local clientHeadsFolder = ReplicatedStorage:FindFirstChild("ClientRollHeads")
+    if not clientHeadsFolder then
+        clientHeadsFolder = Instance.new("Folder")
+        clientHeadsFolder.Name = "ClientRollHeads"
+        clientHeadsFolder.Parent = ReplicatedStorage
+    end
+    
+    -- Clonamos SOLO las cabezas que tienen los BillboardGuis y TextLabels
+    for _, auraFolder in ipairs(assetsFolder.Tiers:GetChildren()) do
+        local headPart = auraFolder:FindFirstChild("Head")
+        if headPart then
+            local headClone = headPart:Clone()
+            headClone.Name = auraFolder.Name -- Renombramos la parte con el nombre de la aura
+            headClone.Parent = clientHeadsFolder
+        end
+    end
+else
+    warn("No se encontró ServerStorage > Assets > Tiers para clonar títulos.")
+end
+
+-- Funcionalidad de equipar auras
 game.Players.PlayerAdded:Connect(function(player: Player)
-    -- 1. Asignar atributo por defecto INMEDIATAMENTE
+    -- Asignar aura por defecto al conectarse
     if not player:GetAttribute("AuraName") then
         player:SetAttribute("AuraName", "Common")
     end
 
-    -- 2. Clonar la UI en un hilo separado (task.spawn) para que NO congele al servidor
-    task.spawn(function()
-        -- Le damos 10 segundos máximo para encontrar el GUI, si no, se cancela sin crashear
-        local playerGui = player:WaitForChild("PlayerGui", 10)
-        local assetsFolder = ServerStorage:FindFirstChild("Assets")
-        
-        if playerGui and assetsFolder and assetsFolder:FindFirstChild("Tiers") then
-            local screenGui = Instance.new("ScreenGui")
-            screenGui.Name = "AuraTiersGUI"
-            screenGui.ResetOnSpawn = false 
-            
-            local tiersClone = assetsFolder.Tiers:Clone()
-            tiersClone.Parent = screenGui
-            screenGui.Parent = playerGui
-        end
-    end)
-
-    -- 3. Equipar al cargar el personaje
+    -- Equipar cuando reaparece el personaje (muerte/reinicio)
     player.CharacterAdded:Connect(function(character: Model)
-        task.wait(0.5) -- Pequeño margen para asegurar que el personaje cargó sus partes físicas
+        task.wait(0.5) -- Pequeño margen para asegurar que el personaje cargó
         local currentAura = player:GetAttribute("AuraName")
         if currentAura then
             AuraManager.EquipAura(character, currentAura)
         end
     end)
 
-    -- 4. Equipar al cambiar de Aura (Con seguro Anti-Recursión)
-    local isEquipping = false
+    -- SEGURO DEFINITIVO ANTI-CRASHEO (Denounce table)
+    local isEquipping = {} -- Tabla para rastrear si cada jugador está en proceso de equipar
     player:GetAttributeChangedSignal("AuraName"):Connect(function()
-        if isEquipping then return end -- Si ya está equipando, ignora la señal
-        isEquipping = true
+        -- Si el jugador ya se está equipando, ignoramos esta señal para evitar bucles infinitos
+        if isEquipping[player] then return end 
+        isEquipping[player] = true
         
         local newAura = player:GetAttribute("AuraName")
-        if player.Character then
+        if player.Character and newAura then
+            print("Equipando nueva aura a " .. player.Name .. ": " .. newAura)
             AuraManager.EquipAura(player.Character, newAura)
         end
         
         task.wait(0.1) -- Tiempo de enfriamiento
-        isEquipping = false
+        isEquipping[player] = nil -- Permitir volver a equipar
     end)
 end)

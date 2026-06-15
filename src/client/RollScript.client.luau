@@ -7,10 +7,8 @@ local LocalPlayer = Players.LocalPlayer
 local RarityDB = require(ReplicatedStorage.Shared.RarityDB)
 local RollEvent = ReplicatedStorage:WaitForChild("RollAuraEvent")
 
--- Buscar la carpeta clonada en el PlayerGui del jugador local
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local AuraTiersGUI = PlayerGui:WaitForChild("AuraTiersGUI")
-local TiersFolder = AuraTiersGUI:WaitForChild("Tiers")
+-- Buscar la carpeta que el servidor preparó para nosotros en ReplicatedStorage
+local ClientHeadsFolder = ReplicatedStorage:WaitForChild("ClientRollHeads")
 
 -- Ordenar las auras de mayor a menor rareza
 local sortedAuras = {}
@@ -45,36 +43,36 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         -- Animación de los 5 primeros destellos
         for i = 1, 5 do
             local randomVisualAura = sortedAuras[math.random(1, #sortedAuras)].Name
-            local auraFolder = TiersFolder:FindFirstChild(randomVisualAura)
+            local headClone = ClientHeadsFolder:FindFirstChild(randomVisualAura)
             
-            if auraFolder then
-                -- BUSCAMOS EL TEXTLABEL DENTRO DE LA CARPETA
-                local textLabel = auraFolder:FindFirstChildWhichIsA("TextLabel")
+            if headClone then
+                -- TU JERARQUÍA: Head > BillboardGui > Name (TextLabel)
+                local nameLabel = headClone:FindFirstChild("BillboardGui") and headClone.BillboardGui:FindFirstChild("Name")
                 
-                if textLabel then
-                    textLabel.Visible = true
+                if nameLabel and nameLabel:IsA("TextLabel") then
+                    nameLabel.Visible = true
                     task.wait(0.1)
-                    textLabel.Visible = false
+                    nameLabel.Visible = false
                 else
-                    task.wait(0.1) -- Mantiene el ritmo si la carpeta está vacía
+                    task.wait(0.1)
                 end
             else
-                task.wait(0.1) -- Mantiene el ritmo si la carpeta no existe
+                task.wait(0.1)
             end
         end
         
         -- Calcular el 6to resultado (el real) y mostrarlo
         local finalAura = calculateRoll()
         
-        local finalFolder = TiersFolder:FindFirstChild(finalAura)
-        if finalFolder then
-            -- BUSCAMOS EL TEXTLABEL DENTRO DE LA CARPETA FINAL
-            local finalTextLabel = finalFolder:FindFirstChildWhichIsA("TextLabel")
+        local finalHead = ClientHeadsFolder:FindFirstChild(finalAura)
+        if finalHead then
+            -- TU JERARQUÍA FINAL
+            local finalNameLabel = finalHead:FindFirstChild("BillboardGui") and finalHead.BillboardGui:FindFirstChild("Name")
             
-            if finalTextLabel then
-                finalTextLabel.Visible = true
+            if finalNameLabel and finalNameLabel:IsA("TextLabel") then
+                finalNameLabel.Visible = true
                 task.wait(2) -- Queda en pantalla 2 segundos
-                finalTextLabel.Visible = false
+                finalNameLabel.Visible = false
             end
         end
         
