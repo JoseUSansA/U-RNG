@@ -77,54 +77,54 @@ local Settings : {[string]: AuraInfo} = {
 		Rarity = 400;
 	};
 	-- Unfinished/Undone
-	["RAINBOW"] = {
-		CreatorId = 933728988;
-		Rarity = 500;
-	};
-	["Ethereal"] = {
-		CreatorId = 933728988;
-		Rarity = 650;
-	};
-	["Radioactive"] = {
-		CreatorId = 933728988;
-		Rarity = 725;
-	};
-	["Space"] = {
-		CreatorId = 933728988;
-		Rarity = 800;
-	};
-	["Infinite"] = {
-		CreatorId = 933728988;
-		Rarity = 900;
-	};
-	["RAINBOW_FUTURIST"] = {
-        CreatorId = 933728988;
-        Rarity = 1000;
-    };
-    ["Cosmic"] = {
-        CreatorId = 933728988;
-        Rarity = 1500;
-    };
-    ["Interdimensional_3D"] = {
-        CreatorId = 933728988;
-        Rarity = 2000;
-    };
-    ["Ghost"] = {
-        CreatorId = 933728988;
-        Rarity = 2500;
-    };
-    ["Glitch_Random"] = {
-        CreatorId = 933728988;
-        Rarity = 3000;
-    };
-    ["Infinite_Transfinite"] = {
-        CreatorId = 933728988;
-        Rarity = 5000;
-    };
-    ["Angel"] = {
-        CreatorId = 933728988;
-        Rarity = 10000;
-    };
+	-- ["RAINBOW"] = {
+	-- 	CreatorId = 933728988;
+	-- 	Rarity = 500;
+	-- };
+	-- ["Ethereal"] = {
+	-- 	CreatorId = 933728988;
+	-- 	Rarity = 650;
+	-- };
+	-- ["Radioactive"] = {
+	-- 	CreatorId = 933728988;
+	-- 	Rarity = 725;
+	-- };
+	-- ["Space"] = {
+	-- 	CreatorId = 933728988;
+	-- 	Rarity = 800;
+	-- };
+	-- ["Infinite"] = {
+	-- 	CreatorId = 933728988;
+	-- 	Rarity = 900;
+	-- };
+	-- ["RAINBOW_FUTURIST"] = {
+    --     CreatorId = 933728988;
+    --     Rarity = 1000;
+    -- };
+    -- ["Cosmic"] = {
+    --     CreatorId = 933728988;
+    --     Rarity = 1500;
+    -- };
+    -- ["Interdimensional_3D"] = {
+    --     CreatorId = 933728988;
+    --     Rarity = 2000;
+    -- };
+    -- ["Ghost"] = {
+    --     CreatorId = 933728988;
+    --     Rarity = 2500;
+    -- };
+    -- ["Glitch_Random"] = {
+    --     CreatorId = 933728988;
+    --     Rarity = 3000;
+    -- };
+    -- ["Infinite_Transfinite"] = {
+    --     CreatorId = 933728988;
+    --     Rarity = 5000;
+    -- };
+    -- ["Angel"] = {
+    --     CreatorId = 933728988;
+    --     Rarity = 10000;
+    -- };
 }
 
 return Settings :: {[string]: AuraInfo}
